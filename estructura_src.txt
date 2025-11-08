@@ -1,0 +1,26 @@
+Listado de rutas de carpetas
+El n£mero de serie del volumen es 0000005B 9C23:D241
+C:\USERS\NANO\DOCUMENTS\CURSOS\CURSO_REACT\APP_PADEL\SRC
+³   App.css
+³   App.js
+³   App.test.js
+³   index.css
+³   index.js
+³   logo.svg
+³   reportWebVitals.js
+³   setupTests.js
+³   
+ÀÄÄÄcomponents
+        Autenticacion.js
+        GestionUsuarios.js
+        Login.js
+        PanelAdministrador.js
+        PanelProfesor.js
+        PanelProfesor_2.js
+        PerfilUsuario.js
+        Registro.js
+        Reservas.js
+        ReservasPublicas.js
+        Reservas_2.js
+        supabaseClient.js
+        

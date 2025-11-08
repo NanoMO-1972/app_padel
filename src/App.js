@@ -18,7 +18,7 @@ import PanelProfesor from './components/PanelProfesor';
 const heroContainerStyle = {
   // 💡 CORRECCIÓN: Usando una imagen genérica real para ver el efecto.
   // ¡REEMPLAZA ESTA URL con la imagen de tu club!
-  backgroundImage: "url('https://picsum.photos/1920/1080?random=1&blur=2')", 
+  //backgroundImage: "url('https://picsum.photos/1920/1080?random=1&blur=2')", 
   backgroundSize: 'cover',
   backgroundPosition: 'center center',
   backgroundAttachment: 'fixed', // Efecto parallax
