@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
-import { Container, Row, Col, Table, Button, Alert, Form } from 'react-bootstrap';
+import { Container, Row, Col, Table, Alert, Form } from 'react-bootstrap';
 
 const ReservasPublicas = () => {
   const [pistas, setPistas] = useState([]);

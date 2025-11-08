@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import {
-  Container, Table, Button, Form, Alert, Modal, Tab, Tabs,
-  DropdownButton, Dropdown
+  Container, Table, Button, Form, Alert, Modal, Tab, Tabs,  
 } from 'react-bootstrap';
 
 const PanelAdministrador = () => {

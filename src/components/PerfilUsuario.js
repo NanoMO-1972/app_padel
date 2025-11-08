@@ -64,7 +64,7 @@ const PerfilUsuario = () => {
     setError('');
     setLoading(true);
 
-    const { data, error } = await supabase.auth.updateUser({ email });
+    const { error } = await supabase.auth.updateUser({ email });
     
     if (error) {
       console.error('Error al actualizar el correo:', error);
