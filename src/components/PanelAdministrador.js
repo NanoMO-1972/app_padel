@@ -15,7 +15,7 @@ const PanelAdministrador = () => {
   const [ModalRole, setModalRole] = useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [nuevoRole, setNuevoRole] = useState('');
-  const roleUsuario = ['usuario', 'profesor', 'admin'];
+  const roleUsuario = ['usuario', 'profesor', 'administrador'];
 
   // --- Estados para Gestión de Pistas ---
   const [pistas, setPistas] = useState([]);
@@ -59,8 +59,7 @@ const PanelAdministrador = () => {
   const modalEditarPista = (pista) => {
     setEditarPista(true);
     setPistaSeleccionada(pista);
-    setFormularioPista({ id: pista.id, 
-                         nombre: pista.nombre }); // <-- Usamos 'nombre'
+    setFormularioPista({ id: pista.id, nombre: pista.nombre }); // <-- Usamos 'nombre'
     setModalPistas(true);
   };
   const cambiosFormularioPistas = (e) => {
@@ -81,12 +80,13 @@ const PanelAdministrador = () => {
   const consultaUsuarios = async () => {
     const { data, error } = await supabase
       .from('Profiles')
-      .select('id, name, role')
+      .select('id, email, name, role')
       .order('name');
     if (error) {
       console.error('Error cargando usuarios:', error);
       setError('Error al cargar la lista de usuarios.');
     } else {
+      console.log("Datos que llegan:" , data);
       setUsuarios(data);
     }
   };

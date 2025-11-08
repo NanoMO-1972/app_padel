@@ -28,7 +28,7 @@ const GestionUsuarios = () => {
   };
 
   const gestionCambioRole = async (userId, newRole) => {
-    if (newRole !== 'admin' && newRole !== 'user') return;
+    if (newRole !== 'administrador' && newRole !== 'user') return;
 
     if (!window.confirm(`¿Estás seguro de que quieres cambiar el rol de este usuario a '${newRole}'?`)) {
       return;
@@ -75,8 +75,8 @@ const GestionUsuarios = () => {
                 <td>{user.id.substring(0, 8)}...</td>
                 <td>{user.name || 'N/A'}</td>
                 <td>
-                  {user.role === 'admin'
-                    ? <span className="text-primary fw-bold">ADMIN</span>
+                  {user.role === 'administrador'
+                    ? <span className="text-primary fw-bold">Administrador</span>
                     : user.role === 'user'
                       ? <span className="text-secondary">Usuario</span>
                       : 'Sin rol'
@@ -90,7 +90,7 @@ const GestionUsuarios = () => {
                     style={{ width: '120px' }}
                   >
                     <option value="user">Usuario</option>
-                    <option value="admin">Admin</option>
+                    <option value="administrador">Administrador</option>
                   </Form.Select>
                 </td>
               </tr>

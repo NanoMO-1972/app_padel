@@ -91,7 +91,7 @@ function App() {
   }
 
   const renderNavigationButtons = () => {
-    if (!session || userRole === 'admin') return null; // Admin tiene botones específicos en su vista
+    if (!session || userRole === 'administrador') return null; // Admin tiene botones específicos en su vista
 
     const navItems = [];
 
@@ -133,7 +133,7 @@ function App() {
     }
 
     // Vista para Administradores (Simple, sin navegación compleja)
-    if (userRole === 'admin') {
+    if (userRole === 'administrador') {
       return (
         <div className="text-center" style={{ padding: '20px' }}>
           <PanelAdministrador />
