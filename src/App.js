@@ -44,7 +44,7 @@ function App() {
 
   const userId = session?.user.id || null;
   const userRole = userProfile?.role || 'user';
-  const userName = userProfile?.name;
+  // const userName = userProfile?.name;
 
   useEffect(() => {
     const fetchUserAndProfile = async (currentSession) => {
