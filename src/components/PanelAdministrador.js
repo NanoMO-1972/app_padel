@@ -15,7 +15,7 @@ const PanelAdministrador = () => {
   const [ModalRole, setModalRole] = useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [nuevoRole, setNuevoRole] = useState('');
-  const roleUsuario = ['usuario', 'profesor', 'administrador'];
+  const roleUsuario = ['usuario', 'profesor', 'admin'];
 
   // --- Estados para Gestión de Pistas ---
   const [pistas, setPistas] = useState([]);
