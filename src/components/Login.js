@@ -15,10 +15,46 @@ const Login = () => {
     setDatosFormulario({ ...datosFormulario, [name]: value });
   };
 
+  // ✅ Validación propia en JavaScript (no del navegador)
+  const validarFormulario = () => {
+    setMessage(''); // limpiamos mensaje previo
+
+    const { email, password } = datosFormulario;
+
+    if (!email) {
+      setMessage('El correo electrónico es obligatorio.');
+      return false;
+    }
+
+    // Validar formato básico de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage('El correo electrónico no tiene un formato válido.');
+      return false;
+    }
+
+    if (!password) {
+      setMessage('La contraseña es obligatoria.');
+      return false;
+    }
+
+    if (password.length < 6) {
+      setMessage('La contraseña debe tener al menos 6 caracteres.');
+      return false;
+    }
+
+    return true;
+  };
+
   const controlSubmit = async (e) => {
     e.preventDefault();
-    setCargaDatos(true);
     setMessage('');
+
+    // ⛔ Primero validamos con nuestra lógica JS
+    const esValido = validarFormulario();
+    if (!esValido) return;
+
+    setCargaDatos(true);
 
     const { error } = await supabase.auth.signInWithPassword({
       email: datosFormulario.email,
@@ -37,18 +73,26 @@ const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+    <div
+      style={{
+        maxWidth: '400px',
+        margin: 'auto',
+        padding: '20px',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+      }}
+    >
       <h2>Iniciar Sesión</h2>
       <form onSubmit={controlSubmit}>
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="email">Correo Electrónico:</label>
           <input
-            type="email"
+            type="text"          
             id="email"
             name="email"
             value={datosFormulario.email}
             onChange={cambiosFormulario}
-            required
+            /* quitamos required para que no valide el navegador automáticamente */
           />
         </div>
         <div style={{ marginBottom: '15px' }}>
@@ -59,14 +103,14 @@ const Login = () => {
             name="password"
             value={datosFormulario.password}
             onChange={cambiosFormulario}
-            required
+            /* sin required: validamos en JS */
           />
         </div>
         <button type="submit" disabled={cargaDatos}>
           {cargaDatos ? 'Iniciando...' : 'Iniciar Sesión'}
         </button>
       </form>
-      {message && <p>{message}</p>}
+      {message && <p style={{ color: 'red', marginTop: '10px' }}>{message}</p>}
     </div>
   );
 };
