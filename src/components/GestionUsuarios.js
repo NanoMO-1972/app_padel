@@ -28,7 +28,7 @@ const GestionUsuarios = () => {
   };
 
   const gestionCambioRole = async (userId, newRole) => {
-    if (newRole !== 'administrador' && newRole !== 'user') return;
+    if (newRole !== 'administrador' && newRole !== 'usuario') return;
 
     if (!window.confirm(`¿Estás seguro de que quieres cambiar el rol de este usuario a '${newRole}'?`)) {
       return;
@@ -77,7 +77,7 @@ const GestionUsuarios = () => {
                 <td>
                   {user.role === 'administrador'
                     ? <span className="text-primary fw-bold">Administrador</span>
-                    : user.role === 'user'
+                    : user.role === 'usuario'
                       ? <span className="text-secondary">Usuario</span>
                       : 'Sin rol'
                   }
@@ -89,7 +89,7 @@ const GestionUsuarios = () => {
                     onChange={(e) => gestionCambioRole(user.id, e.target.value)}
                     style={{ width: '120px' }}
                   >
-                    <option value="user">Usuario</option>
+                    <option value="usuario">Usuario</option>
                     <option value="administrador">Administrador</option>
                   </Form.Select>
                 </td>

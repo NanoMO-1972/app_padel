@@ -15,7 +15,7 @@ import PerfilUsuario from './components/PerfilUsuario';
 import PanelProfesor from './components/PanelProfesor';
 
 // Estilo general de la aplicación (hero + parallax)
-const heroContainerStyle = {
+const heroContenedor = {
   backgroundSize: 'cover',
   backgroundPosition: 'center center',
   backgroundAttachment: 'fixed',
@@ -24,28 +24,30 @@ const heroContainerStyle = {
 };
 
 // Estilo del contenido principal para mejorar legibilidad
-const contentBackgroundStyle = {
-  backgroundColor: 'rgba(255, 255, 255, 0.85)',
-  padding: '20px',
-  borderRadius: '8px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+const contenedorFondo = {
+  backgroundColor: 'rgba(255, 255, 255, 0.75)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  padding: '24px',
+  borderRadius: '12px',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
 };
 
 function App() {
   // Estados principales de la aplicación
   const [datosSesion, setDatosSesion] = useState(null);       // Sesión de Supabase
-  const [perfilUsuario, setPerfilUsuario] = useState(null);  // Perfil extendido del usuario
+  const [perfilUsuario, setPerfilUsuario] = useState(null);  // Perfil del usuario
   const [loading, setLoading] = useState(true);              // Control de carga inicial
-  const [vistaActual, setVistaActual] = useState('reservas');// Navegación interna
+  const [vistaActual, setVistaActual] = useState('reservas');// Vista actual
 
-  // Variables derivadas (seguras)
+  // Variables derivadas
   const usuarioId = datosSesion?.user.id || null;
-  const usuarioRole = perfilUsuario?.role || 'user';
+  const usuarioRole = perfilUsuario?.role || 'usuario';
 
-  // Obtención inicial de sesión y escucha de cambios de autenticación
+  // Obtención inicial de sesión y cambios de autenticación
   useEffect(() => {
     // Función centralizada para sincronizar sesión y perfil
-    const consultaUsuarioPerfil = async (sesionActual) => {
+    const consultaPerfilUsuario = async (sesionActual) => {
       setDatosSesion(sesionActual);
 
       let perfil = null;
@@ -59,7 +61,7 @@ function App() {
           .single();
 
         // Rol por defecto como medida de seguridad
-        perfil = datoPerfil || { role: 'user' };
+        perfil = datoPerfil || { role: 'usuario' };
       }
 
       setPerfilUsuario(perfil);
@@ -67,14 +69,14 @@ function App() {
     };
 
     // Comprobación de sesión al cargar la aplicación
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      consultaUsuarioPerfil(session);
+    supabase.auth.getSession().then(({ data: { sesion } }) => {
+      consultaPerfilUsuario(sesion);
     });
 
     // Listener de cambios de autenticación (login / logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        consultaUsuarioPerfil(session);
+      (event, sesion) => {
+        consultaPerfilUsuario(sesion);
       }
     );
 
@@ -104,7 +106,7 @@ function App() {
     if (usuarioRole === 'profesor') {
       opcionesNav.push({ key: 'reservas', label: 'Reservar / Crear Clase' });
       opcionesNav.push({ key: 'panelProfesor', label: 'Mis Clases' });
-    } else if (usuarioRole === 'user') {
+    } else if (usuarioRole === 'usuario') {
       opcionesNav.push({ key: 'reservas', label: 'Reservas' });
     }
 
@@ -210,10 +212,10 @@ function App() {
 
   // Estructura general de la aplicación
   return (
-    <div className="App text-center" style={heroContainerStyle}>
+    <div className="App text-center" style={heroContenedor}>
       <header
         style={{
-          ...contentBackgroundStyle,
+          ...contenedorFondo,
           borderBottom: '1px solid #ccc',
           margin: '0 auto',
           marginBottom: '20px'
@@ -226,7 +228,7 @@ function App() {
           </p>
         )}
       </header>
-      <main style={{ ...contentBackgroundStyle, maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ ...contenedorFondo, maxWidth: '1200px', margin: '0 auto' }}>
         {renderContenido()}
       </main>
     </div>
