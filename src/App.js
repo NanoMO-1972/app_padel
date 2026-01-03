@@ -1,12 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// 2. Importar React y hooks
+// React y hooks
 import React, { useState, useEffect } from 'react';
 
-// 3. Importar cliente de Supabase
+// Cliente Supabase (capa de datos / autenticación)
 import { supabase } from './components/supabaseClient';
 
-// 4. Importar todos los componentes de la aplicación (todos al mismo nivel)
+// Componentes (vistas)
 import Reservas from './components/Reservas';
 import PanelAdministrador from './components/PanelAdministrador';
 import ReservasPublicas from './components/ReservasPublicas';
@@ -14,22 +14,17 @@ import Autenticacion from './components/Autenticacion';
 import PerfilUsuario from './components/PerfilUsuario';
 import PanelProfesor from './components/PanelProfesor';
 
-// Estilo para la Hero Image y el efecto Parallax
+// Estilo general de la aplicación (hero + parallax)
 const heroContainerStyle = {
-  // 💡 CORRECCIÓN: Usando una imagen genérica real para ver el efecto.
-  // ¡REEMPLAZA ESTA URL con la imagen de tu club!
-  //backgroundImage: "url('https://picsum.photos/1920/1080?random=1&blur=2')", 
   backgroundSize: 'cover',
   backgroundPosition: 'center center',
-  backgroundAttachment: 'fixed', // Efecto parallax
-  minHeight: '100vh', // Asegura que cubra al menos toda la pantalla
-  color: '#333', // Color de texto por defecto
+  backgroundAttachment: 'fixed',
+  minHeight: '100vh',
+  color: '#333',
 };
 
-// Estilo para el encabezado y el contenido principal para mejorar la legibilidad
+// Estilo del contenido principal para mejorar legibilidad
 const contentBackgroundStyle = {
-  // Fondo semitransparente para que la imagen se vea, pero el texto sea legible
-  // Ajuste de 0.9 a 0.85 para más transparencia:
   backgroundColor: 'rgba(255, 255, 255, 0.85)',
   padding: '20px',
   borderRadius: '8px',
@@ -37,92 +32,123 @@ const contentBackgroundStyle = {
 };
 
 function App() {
-  const [session, setSession] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState('reservas');
+  // Estados principales de la aplicación
+  const [datosSesion, setDatosSesion] = useState(null);       // Sesión de Supabase
+  const [perfilUsuario, setPerfilUsuario] = useState(null);  // Perfil extendido del usuario
+  const [loading, setLoading] = useState(true);              // Control de carga inicial
+  const [vistaActual, setVistaActual] = useState('reservas');// Navegación interna
 
-  const userId = session?.user.id || null;
-  const userRole = userProfile?.role || 'user';
-  // const userName = userProfile?.name;
+  // Variables derivadas (seguras)
+  const usuarioId = datosSesion?.user.id || null;
+  const usuarioRole = perfilUsuario?.role || 'user';
 
+  // Obtención inicial de sesión y escucha de cambios de autenticación
   useEffect(() => {
-    const fetchUserAndProfile = async (currentSession) => {
-      setSession(currentSession);
+    // Función centralizada para sincronizar sesión y perfil
+    const consultaUsuarioPerfil = async (sesionActual) => {
+      setDatosSesion(sesionActual);
 
-      let profile = null;
+      let perfil = null;
 
-      if (currentSession) {
-        // En el código real, buscaría el perfil en Supabase
-        const { data: profileData } = await supabase
+      // Si hay sesión, se obtiene el perfil del usuario desde la BD
+      if (sesionActual) {
+        const { data: datoPerfil } = await supabase
           .from('Profiles')
           .select('role,name')
-          .eq('id', currentSession.user.id)
+          .eq('id', sesionActual.user.id)
           .single();
 
-        profile = profileData || { role: 'user' };
+        // Rol por defecto como medida de seguridad
+        perfil = datoPerfil || { role: 'user' };
       }
 
-      setUserProfile(profile);
+      setPerfilUsuario(perfil);
       setLoading(false);
     };
 
+    // Comprobación de sesión al cargar la aplicación
     supabase.auth.getSession().then(({ data: { session } }) => {
-      fetchUserAndProfile(session);
+      consultaUsuarioPerfil(session);
     });
 
+    // Listener de cambios de autenticación (login / logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        fetchUserAndProfile(session);
+        consultaUsuarioPerfil(session);
       }
     );
 
+    // Limpieza del listener al desmontar el componente
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
+  // Cierre de sesión
+  const Logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) console.error('Error al cerrar sesión:', error.message);
-    setCurrentView('reservas');
+    setVistaActual('reservas');
   };
 
+  // Pantalla de carga mientras se obtiene sesión y perfil
   if (loading) {
     return <div className="text-center my-5">Cargando...</div>;
   }
 
-  const renderNavigationButtons = () => {
-    if (!session || userRole === 'administrador') return null; // Admin tiene botones específicos en su vista
+  // Navegación dinámica según rol
+  const renderBotonesNavegacion = () => {
+    // El administrador tiene su propio panel
+    if (!datosSesion || usuarioRole === 'administrador') return null;
 
-    const navItems = [];
+    const opcionesNav = [];
 
-    if (userRole === 'profesor') {
-      navItems.push({ key: 'reservas', label: 'Reservar / Crear Clase' });
-      navItems.push({ key: 'panelProfesor', label: 'Mis Clases' });
-    } else if (userRole === 'user') {
-      navItems.push({ key: 'reservas', label: 'Reservas' });
+    if (usuarioRole === 'profesor') {
+      opcionesNav.push({ key: 'reservas', label: 'Reservar / Crear Clase' });
+      opcionesNav.push({ key: 'panelProfesor', label: 'Mis Clases' });
+    } else if (usuarioRole === 'user') {
+      opcionesNav.push({ key: 'reservas', label: 'Reservas' });
     }
 
-    navItems.push({ key: 'perfil', label: 'Mi Perfil' });
+    opcionesNav.push({ key: 'perfil', label: 'Mi Perfil' });
 
     return (
       <div className="text-center" style={{ marginBottom: '20px' }}>
-        {navItems.map(item => (
+        {opcionesNav.map(item => (
           <button
             key={item.key}
-            onClick={() => setCurrentView(item.key)}
-            style={{ marginRight: '10px', padding: '8px', border: currentView === item.key ? '2px solid #007bff' : '1px solid #ccc', backgroundColor: currentView === item.key ? '#e9f3ff' : 'white', borderRadius: '5px', cursor: 'pointer' }}
+            onClick={() => setVistaActual(item.key)}
+            style={{
+              marginRight: '10px',
+              padding: '8px',
+              border: vistaActual === item.key ? '2px solid #007bff' : '1px solid #ccc',
+              backgroundColor: vistaActual === item.key ? '#e9f3ff' : 'white',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
           >
             {item.label}
           </button>
         ))}
-        <button onClick={handleLogout} style={{ padding: '8px', border: '1px solid red', backgroundColor: '#dc3545', color: 'white', borderRadius: '5px', cursor: 'pointer' }}>Cerrar Sesión</button>
+        <button
+          onClick={Logout}
+          style={{
+            padding: '8px',
+            border: '1px solid red',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Cerrar Sesión
+        </button>
       </div>
     );
-  }
+  };
 
-  const renderContent = () => {
-    // Si no hay sesión (usuario no logueado)
-    if (!session) {
+  // Renderizado del contenido principal según sesión y rol
+  const renderContenido = () => {
+    // Usuario no autenticado
+    if (!datosSesion) {
       return (
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <Autenticacion />
@@ -132,43 +158,80 @@ function App() {
       );
     }
 
-    // Vista para Administradores (Simple, sin navegación compleja)
-    if (userRole === 'administrador') {
+    // Administrador
+    if (usuarioRole === 'administrador') {
       return (
         <div className="text-center" style={{ padding: '20px' }}>
           <PanelAdministrador />
-          <button onClick={handleLogout} style={{ padding: '10px 20px', border: 'none', backgroundColor: '#dc3545', color: 'white', borderRadius: '5px', marginTop: '15px', cursor: 'pointer' }}>Cerrar Sesión</button>
+          <button
+            onClick={Logout}
+            style={{
+              padding: '10px 20px',
+              border: 'none',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              borderRadius: '5px',
+              marginTop: '15px',
+              cursor: 'pointer'
+            }}
+          >
+            Cerrar Sesión
+          </button>
         </div>
       );
     }
 
-    // Vistas de Usuario Normal y Profesor (con navegación)
+    // Usuario normal y profesor
     return (
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        {renderNavigationButtons()}
+        {renderBotonesNavegacion()}
         <hr />
-        {currentView === 'reservas' && <Reservas userId={userId} roleUsuario={userRole} />}
-        {currentView === 'perfil' && <PerfilUsuario />}
-        {currentView === 'panelProfesor' && userRole === 'profesor' && <PanelProfesor userId={userId} />}
-
-        {currentView !== 'reservas' && currentView !== 'perfil' && currentView !== 'panelProfesor' && (
-          <div style={{ color: 'blue', padding: '15px', border: '1px solid blue', borderRadius: '5px', textAlign: 'center' }}>Selecciona una opción de navegación.</div>
+        {vistaActual === 'reservas' && <Reservas usuarioId={usuarioId} usuarioRole={usuarioRole} />}
+        {vistaActual === 'perfil' && <PerfilUsuario />}
+        {vistaActual === 'panelProfesor' && usuarioRole === 'profesor' && (
+          <PanelProfesor usuarioId={usuarioId} />
+        )}
+        {vistaActual !== 'reservas' && vistaActual !== 'perfil' && vistaActual !== 'panelProfesor' && (
+          <div
+            style={{
+              color: 'blue',
+              padding: '15px',
+              border: '1px solid blue',
+              borderRadius: '5px',
+              textAlign: 'center'
+            }}
+          >
+            Selecciona una opción de navegación.
+          </div>
         )}
       </div>
     );
   };
 
+  // Estructura general de la aplicación
   return (
     <div className="App text-center" style={heroContainerStyle}>
-      <header style={{ ...contentBackgroundStyle, borderBottom: '1px solid #ccc', margin: '0 auto', marginBottom: '20px' }}>
-        <h1 style={{ color: '#007bff' }}> Club de Pádel </h1>
-        {session && <p>Bienvenido, {userProfile?.name} ({userProfile?.role.toUpperCase()})</p>}
+      <header
+        style={{
+          ...contentBackgroundStyle,
+          borderBottom: '1px solid #ccc',
+          margin: '0 auto',
+          marginBottom: '20px'
+        }}
+      >
+        <h1 style={{ color: '#007bff' }}>Club de Pádel</h1>
+        {datosSesion && (
+          <p>
+            Bienvenido, {perfilUsuario?.name} ({perfilUsuario?.role.toUpperCase()})
+          </p>
+        )}
       </header>
       <main style={{ ...contentBackgroundStyle, maxWidth: '1200px', margin: '0 auto' }}>
-        {renderContent()}
+        {renderContenido()}
       </main>
     </div>
   );
-};
+}
 
 export default App;
+
