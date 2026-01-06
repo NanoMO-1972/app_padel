@@ -56,6 +56,7 @@ const Reservas = () => {
       const { data: datosPistas, error: errorPistas } = await supabase
         .from('Pistas')
         .select('*')
+        .eq('esta_activa', true)
         .order('id', { ascending: true });
 
       // 3. Obtener Reservas para la Fecha Seleccionada
@@ -105,7 +106,19 @@ const Reservas = () => {
       }
     }
 
-    // 2. Lógica de límite de reserva por usuario (user: 1, profesor: 3)
+    //2. Verificar que la pista sigue activa
+    const { data: pista, error: errorPista } = await supabase
+    .from('Pistas')
+    .select('esta_activa')
+    .eq('id', pistaId)
+    .single();
+
+    if (errorPista || !pista?.esta_activa) {
+    alert('La pista no está disponible');
+    return;
+}
+
+    // 3. Lógica de límite de reserva por usuario (user: 1, profesor: 3)
     if (roleUsuario === 'user' || roleUsuario === 'profesor') {
       const { data: reservasUsuario, error: errorConsulta } = await supabase
         .from('Reservas')

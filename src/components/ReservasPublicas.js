@@ -23,6 +23,7 @@ const ReservasPublicas = () => {
       const { data: datosPistas, error: pistasError } = await supabase
         .from('Pistas')
         .select('*')
+        .eq('esta_activa', true)
         .order('id', { ascending: true });
 
       const { data: datosReservas, error: reservasError } = await supabase
@@ -45,7 +46,9 @@ const ReservasPublicas = () => {
 
   const verificarReserva = (pistaId, hora) => {
     return reservas.find(reserva => 
-      reserva.pista_id === pistaId && reserva.hora_inicio.substring(0, 5) === hora
+      reserva.pista_id === pistaId &&
+      reserva.fecha === fechaSeleccionada &&
+      reserva.hora_inicio.substring(0, 5) === hora
     );
   };
 
