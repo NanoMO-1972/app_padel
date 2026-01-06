@@ -11,7 +11,7 @@ import Reservas from './components/Reservas';
 import PanelAdministrador from './components/PanelAdministrador';
 import ReservasPublicas from './components/ReservasPublicas';
 import Autenticacion from './components/Autenticacion';
-import PerfilUsuario from './components/PerfilUsuario';
+import PanelUsuario from './components/PanelUsuario';
 import PanelProfesor from './components/PanelProfesor';
 
 // Estilo general de la aplicación (hero + parallax)
@@ -189,7 +189,7 @@ function App() {
         {renderBotonesNavegacion()}
         <hr />
         {vistaActual === 'reservas' && <Reservas usuarioId={usuarioId} usuarioRole={usuarioRole} />}
-        {vistaActual === 'perfil' && <PerfilUsuario />}
+        {vistaActual === 'perfil' && <PanelUsuario />}
         {vistaActual === 'panelProfesor' && usuarioRole === 'profesor' && (
           <PanelProfesor usuarioId={usuarioId} />
         )}

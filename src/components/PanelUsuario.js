@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 
-const PerfilUsuario = () => {
+const PanelUsuario = () => {
   const [loading, setLoading] = useState(true);
   const [perfil, setPerfil] = useState({ name: '' });
   const [email, setEmail] = useState('');
@@ -160,4 +160,4 @@ const PerfilUsuario = () => {
   );
 };
 
-export default PerfilUsuario;
+export default PanelUsuario;
